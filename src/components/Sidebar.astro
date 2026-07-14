@@ -1,0 +1,27 @@
+---
+import { NAV, UI, type Locale } from '../lib/nav';
+
+interface Props {
+  locale: Locale;
+  currentSlug: string;
+}
+const { locale, currentSlug } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<aside class="sidebar" id="site-sidebar">
+  <p class="sidebar__title">{UI.nav[locale]}</p>
+  <nav aria-label={UI.nav[locale]}>
+    {
+      NAV.map((item) => {
+        const href = `${base}/${locale}/${item.href}`;
+        const current = item.slug === currentSlug;
+        return (
+          <a href={href} aria-current={current ? 'page' : undefined}>
+            {item.label[locale]}
+          </a>
+        );
+      })
+    }
+  </nav>
+</aside>

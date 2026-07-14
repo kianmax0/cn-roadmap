@@ -1,0 +1,100 @@
+---
+import '../styles/global.css';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import LangSwitch from '../components/LangSwitch.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { UI, type Locale } from '../lib/nav';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description?: string;
+  slug: string;
+  showSidebar?: boolean;
+}
+
+const {
+  locale,
+  title,
+  description = UI.subtitle[locale],
+  slug,
+  showSidebar = true,
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = `${base}/${locale}/`;
+const pageTitle = slug === 'home' ? UI.brand : `${title} · ${UI.brand}`;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <title>{pageTitle}</title>
+    <script is:inline>
+      (function () {
+        try {
+          const stored = localStorage.getItem('cn-theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.setAttribute(
+            'data-theme',
+            stored || (prefersDark ? 'dark' : 'light')
+          );
+        } catch (_) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        {
+          showSidebar && (
+            <button type="button" class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false">
+              {UI.menu[locale]}
+            </button>
+          )
+        }
+        <a class="brand" href={home}>{UI.brand}</a>
+        <div class="header-spacer"></div>
+        <div class="header-actions">
+          <LangSwitch locale={locale} slug={slug} />
+          <ThemeToggle locale={locale} />
+        </div>
+      </div>
+    </header>
+
+    {
+      showSidebar ? (
+        <div class="layout">
+          <Sidebar locale={locale} currentSlug={slug} />
+          <main class="main">
+            <slot />
+          </main>
+        </div>
+      ) : (
+        <main class="main" style="width:min(100% - 2rem, var(--max)); margin:0 auto; padding:0 0 3rem;">
+          <slot />
+        </main>
+      )
+    }
+
+    <script>
+      const toggle = document.getElementById('menu-toggle');
+      const sidebar = document.getElementById('site-sidebar');
+      toggle?.addEventListener('click', () => {
+        const open = sidebar?.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    </script>
+  </body>
+</html>

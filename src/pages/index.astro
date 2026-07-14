@@ -1,0 +1,25 @@
+---
+// Root redirect: prefer stored language, else browser language, else zh
+---
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CN Roadmap</title>
+    <script is:inline define:vars={{ base: import.meta.env.BASE_URL }}>
+      (function () {
+        let lang = 'zh';
+        try {
+          const stored = localStorage.getItem('cn-lang');
+          if (stored === 'zh' || stored === 'en') lang = stored;
+          else if (navigator.language && navigator.language.toLowerCase().startsWith('en')) lang = 'en';
+        } catch (_) {}
+        const target = (base.replace(/\/$/, '') || '') + '/' + lang + '/';
+        location.replace(target);
+      })();
+    </script>
+    <meta http-equiv="refresh" content="0;url=./zh/" />
+  </head>
+  <body></body>
+</html>

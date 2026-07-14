@@ -1,0 +1,20 @@
+---
+import { siblingLocalePath, type Locale } from '../lib/nav';
+
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+const { locale, slug } = Astro.props;
+const href = import.meta.env.BASE_URL.replace(/\/$/, '') + siblingLocalePath(locale, slug);
+const label = locale === 'zh' ? 'EN' : '中';
+---
+
+<a
+  class="icon-btn"
+  href={href}
+  hreflang={locale === 'zh' ? 'en' : 'zh'}
+  onclick={`localStorage.setItem('cn-lang','${locale === 'zh' ? 'en' : 'zh'}')`}
+>
+  {label}
+</a>
